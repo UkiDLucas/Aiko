@@ -17,15 +17,14 @@ import java.util.regex.Matcher;
  * This Slack bot extends {@link Bot} created by ramswaroop 1.0.0, 05/06/2016
  *
  * @author ukilucas
- * @version 1, September 24, 2016
+ * @created September 24, 2016
  */
 @Component
 public class SlackBot extends Bot {
-
     private static final Logger logger = LoggerFactory.getLogger(SlackBot.class);
 
     /**
-     * This tocken is SPECIFIC to you Slack bot application, you have to generate it yourself at
+     * This token is SPECIFIC to you Slack bot application, you have to generate it yourself at
      * <a href="https://my.slack.com/services/new/bot">creating a new bot</a>
      * and place it in resources/application.properties text file.
      * slackBotToken=XYZ
@@ -33,21 +32,28 @@ public class SlackBot extends Bot {
     @Value("${slackBotToken}")
     private String slackToken;
 
-    @Override
-    public String getSlackToken() {
-        if (slackToken == null || slackToken.length() == 0) {
-            System.err.println("Missing slackBotToken entry in resources/application.properties visit https://my.slack.com/services/new/bot");
-        }
-        return slackToken;
-    }
-
     private String botName;
     private String eventType;
     private String receivedText;
+    private StringBuffer reply;
 
-    @Override
-    public Bot getSlackBot() {
-        return this;
+
+    private void buildAnswer() {
+        reply.append("This is " + botName + "\n");
+        if (eventType.equals(EventType.DIRECT_MESSAGE.name())) {
+            reply.append("I am responding because you addressed me in a direct chat." + "\n");
+        } else if (eventType.equals(EventType.DIRECT_MENTION.name())) {
+            reply.append("I am responding because you mentioned my name." + "\n");
+        } else if (eventType.equals(EventType.MESSAGE.name())) {
+            reply.append("I am responding because you wrote a message." + "\n");
+        }
+    }
+
+    private void processIncomingMessage(Event event) {
+        eventType = event.getType();
+        botName = capitalizeName(slackService.getCurrentUser().getName());
+        receivedText = event.getText();
+        reply = new StringBuffer();
     }
 
     /**
@@ -60,35 +66,12 @@ public class SlackBot extends Bot {
      */
     @Controller(events = {EventType.DIRECT_MENTION, EventType.DIRECT_MESSAGE})
     public void onReceiveDM(WebSocketSession session, Event event) {
-
-        eventType = event.getType();
-        botName = capitalizeName(slackService.getCurrentUser().getName());
-        receivedText = event.getText();
-
-        StringBuffer answer = new StringBuffer();
-
-        if (eventType.equals(EventType.DIRECT_MESSAGE.name())) {
-            answer.append("I am responding because you addressed me in a direct chat." + "\n");
-        } else if (eventType.equals(EventType.DIRECT_MENTION.name())) {
-            answer.append("I am responding because you mentioned my name." + "\n");
-        }
-        answer.append("Hi, I am " + botName + "\n");
-
-        reply(session, event, new Message(answer.toString()));
-
-        log("Event Type: " + eventType);
-        log("Received Text: " + receivedText);
-        log("Reply: " + answer.toString());
-        
-        // null values
-        log("Channel " + event.getChannel());
-        log("Comment " + event.getComment());
-        log("User " + event.getItemUser());
+        processIncomingMessage(event);
+        buildAnswer();
+        reply(session, event, new Message(reply.toString()));
+        printLogs(event);
     }
 
-    private void log(String text) {
-        System.err.println(text);
-    }
 
     /**
      * Invoked when bot receives an event of type message with text satisfying the pattern {@code
@@ -100,23 +83,21 @@ public class SlackBot extends Bot {
      */
     @Controller(
             events = {EventType.MESSAGE, EventType.DIRECT_MESSAGE},
-            pattern = "^([a-z ]{2})(\\d+)([a-z ]{2})$"
+            pattern = "^([a-zA-Z0-9_.]+)@([a-zA-Z0-9_.]+).([a-zA-Z]{2,5})$"
     )
     public void onReceiveMessage(WebSocketSession session, Event event, Matcher matcher) {
 
-        String botName = capitalizeName(slackService.getCurrentUser().getName());
-        String eventText = event.getText();
+        processIncomingMessage(event);
+        buildAnswer();
 
-        StringBuffer sb = new StringBuffer();
-        sb.append("Hi, I am " + botName + "\n");
-        sb.append("received text " + eventText + "\n");
+        reply.append("I am replying because your message matched an email pattern.\n");
 
-        sb.append("First group: " + matcher.group(0) + "\n");
-        sb.append("Second group: " + matcher.group(1) + "\n");
-        sb.append("Third group: " + matcher.group(2) + "\n");
-        sb.append("Fourth group: " + matcher.group(3) + "\n");
+        for (int i = 0; i <= matcher.groupCount(); i++) {
+            reply.append("Matcher group " + i + ": " + matcher.group(i) + "\n");
+        }
 
-        reply(session, event, new Message(sb.toString()));
+        reply(session, event, new Message(reply.toString()));
+        printLogs(event);
     }
 
     /**
@@ -222,5 +203,33 @@ public class SlackBot extends Bot {
         word.append(name);
         word.setCharAt(0, Character.toUpperCase(word.charAt(0)));
         return word.toString();
+    }
+
+    @Override
+    public String getSlackToken() {
+        if (slackToken == null || slackToken.length() == 0) {
+            System.err.println("Missing slackBotToken entry in resources/application.properties visit https://my.slack.com/services/new/bot");
+        }
+        return slackToken;
+    }
+
+    @Override
+    public Bot getSlackBot() {
+        return this;
+    }
+
+    private void log(String text) {
+        System.err.println(text);
+    }
+
+    private void printLogs(Event event) {
+        log("Event Type: " + eventType);
+        log("Received Text: " + receivedText);
+        log("Reply: " + reply.toString());
+
+        // null values
+        log("Channel " + event.getChannel());
+        log("Comment " + event.getComment());
+        log("User " + event.getItemUser());
     }
 }
