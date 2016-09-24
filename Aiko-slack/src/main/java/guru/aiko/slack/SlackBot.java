@@ -43,6 +43,7 @@ public class SlackBot extends Bot {
 
     private String botName;
     private String eventType;
+    private String receivedText;
 
     @Override
     public Bot getSlackBot() {
@@ -59,37 +60,30 @@ public class SlackBot extends Bot {
      */
     @Controller(events = {EventType.DIRECT_MENTION, EventType.DIRECT_MESSAGE})
     public void onReceiveDM(WebSocketSession session, Event event) {
-        logger.debug("Channel " + event.getChannel());
-        logger.debug("Comment " + event.getComment());
-        logger.debug("User " + event.getItemUser());
 
         eventType = event.getType();
-        log("Event Tyep: " + eventType);
-
         botName = capitalizeName(slackService.getCurrentUser().getName());
-        String eventText = event.getText();
+        receivedText = event.getText();
 
-        StringBuffer sb = new StringBuffer();
+        StringBuffer answer = new StringBuffer();
 
-        if (eventType.equals(EventType.DIRECT_MESSAGE.name()))
-            sb.append("I am responding because you adderesd me in a direct chat" + "\n");
-        sb.append("Hi, I am " + botName + "\n");
-        sb.append("received text " + eventText + "\n");
-        //    sb.append("Channel " + event.getChannel() + "\n");
-        //    sb.append("Item " + event.getItem() + "\n");
-        //    sb.append("Latest " + event.getLatest() + "\n");
-        //    sb.append("Comment " + event.getComment() + "\n");
-        //    sb.append("User " + event.getItemUser() + "\n");
-        //    sb.append("Deleted Ts " + event.getDeletedTs() + "\n");
-        //    sb.append("domain " + event.getDomain() + "\n");
-        //    sb.append("presence " + event.getPresence() + "\n");
-        //    sb.append("type " + event.getType() + "\n");
-        //    sb.append("user id " + event.getUserId() + "\n");
-        //    sb.append("names " + event.getNames() + "\n");
-        //    sb.append("channel id " + event.getChannelId() + "\n");
-        //    sb.append("replay to " + event.getReplyTo() + "\n");
+        if (eventType.equals(EventType.DIRECT_MESSAGE.name())) {
+            answer.append("I am responding because you addressed me in a direct chat." + "\n");
+        } else if (eventType.equals(EventType.DIRECT_MENTION.name())) {
+            answer.append("I am responding because you mentioned my name." + "\n");
+        }
+        answer.append("Hi, I am " + botName + "\n");
 
-        reply(session, event, new Message(sb.toString()));
+        reply(session, event, new Message(answer.toString()));
+
+        log("Event Type: " + eventType);
+        log("Received Text: " + receivedText);
+        log("Reply: " + answer.toString());
+        
+        // null values
+        log("Channel " + event.getChannel());
+        log("Comment " + event.getComment());
+        log("User " + event.getItemUser());
     }
 
     private void log(String text) {
