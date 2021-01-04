@@ -3,3 +3,4 @@
 *.iml
 target/
 application.properties
+notebooks/.ipynb_checkpoints/fetch_wikipedia-checkpoint.ipynb
