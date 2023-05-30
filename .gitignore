@@ -3,4 +3,10 @@
 *.iml
 target/
 application.properties
-notebooks/.ipynb_checkpoints/fetch_wikipedia-checkpoint.ipynb
+notebooks/.ipynb_checkpoints/*.*
+GPT/jupyter/.ipynb_checkpoints/*.*
+GPT/models/*.*
+GPT/vectorstore/*
+Obsidian/*
+GPT/vocabulary/*
+
