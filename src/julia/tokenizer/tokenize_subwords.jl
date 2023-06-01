@@ -1,27 +1,33 @@
 using DelimitedFiles
-text = "There is something regal in the antigravity air. Farming is an agricultural business, it does not use antigovermantal regulations."
-terms = ["reg", "anti", "agri"]
-output = []
 
-function tokenize_by_root_words(original_text::String, terms::Array{String,1})
+function tokenize_subwords(original_text::String, tokens::Dict{String, Integer})
     text_by_spaces = split(original_text)
-    println("text_by_spaces ", text_by_spaces)
+    println("text_by_spaces : \n", text_by_spaces)
     
     # Create a copy of text to prevent original text modification
-    tokens = []
+     
+
     
     # Iterate over terms
-    for root in terms
+    for element in tokens
+        root = element[1]
         for word in text_by_spaces # TODO parallelize
+
             # If the term exists in the text
+            println("- check if the root '", root,"' exists in word '", word, "' ")
             while occursin(root, word)
-                println("the root '", root,"' exists in word '", word, "' ")
+                println("- the root '", root,"' exists in word '", word, "' ")
 
                 # Get the start and end indices of the term in the text
-                start_ind, end_ind = findfirst(root, word)
-                println("processing root '", root,"' in in word '", word, 
-                "'  start_ind ", start_ind, " end_ind ", end_ind, " found '", word[start_ind:end_ind+1], "' " )
+                range = findfirst(root, word)
+                println("findfirst ", range, typeof(range) );
+                
+                println("- processing root '", root,"' in in word '", word, "' ") 
+                println("-- ", range, " found '", word[range], "' " )
                 return
+                
+                # Add new token to dictionnary, 
+                # increment "," +1
 
                 # If the term is not at the start of the text
                 if start_ind > 1
@@ -47,11 +53,6 @@ function tokenize_by_root_words(original_text::String, terms::Array{String,1})
 
     return tokens
 end
-
-# Testing the function
-
-output = tokenize_by_root_words(text, terms)
-println(output)
 
 
 
