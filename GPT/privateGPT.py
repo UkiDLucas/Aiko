@@ -13,11 +13,17 @@ from python.query_private_embedings import query_private_embedings
 
 load_dotenv() # make sure you edited .env file
 
-embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
-persist_directory = os.environ.get('PERSIST_DIRECTORY')
-model_type = os.environ.get('MODEL_TYPE')
-model_path = os.environ.get('MODEL_PATH')
-model_n_ctx = os.environ.get('MODEL_N_CTX')
+
+# Load environment variables
+
+# all-MiniLM-L6-v2:
+# It maps sentences & paragraphs to a 384 dimensional dense vector space 
+# and can be used for tasks like clustering or semantic search. 
+embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME", 'all-MiniLM-L6-v2)
+persist_directory = os.environ.get('PERSIST_DIRECTORY', 'db')
+model_type = os.environ.get('MODEL_TYPE', "GPT4All")
+model_path = os.environ.get('MODEL_PATH', "models/ggml-gpt4all-j-v1.3-groovy.bin")
+model_n_ctx = os.environ.get('MODEL_N_CTX', "4000")
 
 from constants import CHROMA_SETTINGS
 

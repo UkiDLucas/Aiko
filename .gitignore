@@ -9,7 +9,6 @@ GPT/models/*.*
 GPT/vectorstore/*
 Obsidian/*
 GPT/vocabulary/*
-
 GPT/.env
 GPT/__pycache__/*.*
 GPT/db/*.*
