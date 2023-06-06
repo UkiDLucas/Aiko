@@ -8,6 +8,7 @@ from langchain.llms import GPT4All, LlamaCpp
 from datetime import datetime
 import os
 import argparse
+import timeit # execution timer
 
 from python.query_private_embedings import query_private_embedings
 
@@ -19,7 +20,7 @@ load_dotenv() # make sure you edited .env file
 # all-MiniLM-L6-v2:
 # It maps sentences & paragraphs to a 384 dimensional dense vector space 
 # and can be used for tasks like clustering or semantic search. 
-embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME", 'all-MiniLM-L6-v2)
+embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME", "all-MiniLM-L6-v2")
 persist_directory = os.environ.get('PERSIST_DIRECTORY', 'db')
 model_type = os.environ.get('MODEL_TYPE', "GPT4All")
 model_path = os.environ.get('MODEL_PATH', "models/ggml-gpt4all-j-v1.3-groovy.bin")
@@ -52,29 +53,30 @@ def main():
         if query == "exit":
             break
         
+        start = timeit.timeit()
         now = datetime.now()
         print("\n\n> Start: ", now.strftime("%H:%M:%S") )
         # Get the answer from the chain
 
         text_snippet_Dict = query_private_embedings(query, retrievalQA)
-        
-        # res = qa(query)
-        print("\n\n> answer from the chain: ", text_snippet_Dict , "\n\n", now.strftime("%H:%M:%S"))
+        print("time elapsed: ", timeit.timeit() - start)
+
+        res = qa(query)
+        print("time elapsed: ", timeit.timeit() - start)
+
         for key, value in text_snippet_Dict.items():
-            print(key, value)
+            print("{} ({})".format(key, value))
 
-        # answer, docs = res['result'], [] if args.hide_source else res['source_documents']
-
-        # Print the result
-        print("\n\n> Question:")
-        # print(query)
+        answer, docs = res['result'], [] if args.hide_source else res['source_documents']
         print("\n> Answer:")
         # print(answer)
 
         # Print the relevant sources used for the answer
-        # for document in docs:
-        #    print("\n> " + document.metadata["source"] + ":")
-        #    print(document.page_content)
+        for document in docs:
+            print("\n> " + document.metadata["source"] + ":")
+            print(document.page_content)
+        
+        print("END time elapsed: ", timeit.timeit() - start)
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='privateGPT: Ask questions to your documents without an internet connection, '
