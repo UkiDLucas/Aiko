@@ -11,3 +11,8 @@ Obsidian/*
 GPT/vocabulary/*
 
 GPT/.env
+GPT/__pycache__/*.*
+GPT/db/*.*
+GPT/db/*
+GPT/text_corpus/*.*
+

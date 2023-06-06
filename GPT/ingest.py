@@ -32,9 +32,13 @@ load_dotenv()
 
 
 # Load environment variables
-persist_directory = os.environ.get('PERSIST_DIRECTORY')
-source_directory = os.environ.get('SOURCE_DIRECTORY', 'source_documents')
-embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME')
+persist_directory = os.environ.get('PERSIST_DIRECTORY', 'db')
+source_directory = os.environ.get('SOURCE_DIRECTORY', 'text_corpus')
+
+# all-MiniLM-L6-v2:
+# It maps sentences & paragraphs to a 384 dimensional dense vector space 
+# and can be used for tasks like clustering or semantic search.
+embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME', 'all-MiniLM-L6-v2')
 chunk_size = 500
 chunk_overlap = 50
 
@@ -165,23 +169,26 @@ def main():
         db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
         collection = db.get()
         texts = process_documents([metadata['source'] for metadata in collection['metadatas']])
+        print("Text corpus read in: ", timeit.timeit() - start)
         print(f"Creating embeddings. May take some minutes...")
         try:
             db.add_documents(texts)
+            print(f"Added new text.")
         except Exception as e:
             print('An error occurred in db.add_documents(texts): ', e)
     else:
         # Create and store locally vectorstore
-        print("Creating new vectorstore")
+        print("Creating new vector store: ", persist_directory)
         texts = process_documents()
-        print(f"Creating embeddings. May take some minutes...")
+        print("Text corpus read in: ", timeit.timeit() - start)
+        print(f"Creating embeddings db. May take some minutes...")
         db = Chroma.from_documents(texts, embeddings, persist_directory=persist_directory, client_settings=CHROMA_SETTINGS)
     db.persist()
     db = None
 
     print(f" Ingestion complete. Run python privateGPT.py ")
     end = timeit.timeit()
-    print(end - start)
+    print("It took: ", end - start)
 
 
 if __name__ == "__main__":
