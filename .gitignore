@@ -10,3 +10,4 @@ GPT/vectorstore/*
 Obsidian/*
 GPT/vocabulary/*
 
+GPT/.env
