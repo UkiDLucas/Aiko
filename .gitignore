@@ -17,3 +17,4 @@ GPT/text_corpus/*.*
 
 src/julia/.ipynb_checkpoints/*
 src/notebooks/.ipynb_checkpoints/*
+src/julia/xml/output.csv
