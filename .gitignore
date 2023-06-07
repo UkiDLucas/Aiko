@@ -15,3 +15,5 @@ GPT/db/*.*
 GPT/db/*
 GPT/text_corpus/*.*
 
+src/julia/.ipynb_checkpoints/*
+src/notebooks/.ipynb_checkpoints/*
