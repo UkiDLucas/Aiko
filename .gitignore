@@ -20,5 +20,10 @@ src/notebooks/.ipynb_checkpoints/*
 src/julia/xml/output.csv
 GPT/.ipynb_checkpoints/*
 src/julia/parallel_computing/.ipynb_checkpoints/*
-
 GPT/python/__pycache__/*
+db_text_embeddings/*
+src/python/__pycache__/*
+text_corpus/*
+
+vocabulary/*
+
