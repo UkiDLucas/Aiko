@@ -6,6 +6,21 @@ from typing import List
 from dotenv import load_dotenv
 from multiprocessing import Pool
 from tqdm import tqdm
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import Chroma
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.docstore.document import Document
+from constants import CHROMA_SETTINGS
+
+
+
+
+
+# adding AIKO/GPT/python/ to the system path
+#import sys
+#sys.path.insert(0, '/Users/uki_lucas/AIKO/GPT/python/')
+
+load_dotenv()
 
 from langchain.document_loaders import (
     CSVLoader,
@@ -21,29 +36,30 @@ from langchain.document_loaders import (
     UnstructuredWordDocumentLoader,
 )
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.docstore.document import Document
-from constants import CHROMA_SETTINGS
 
 
-load_dotenv()
+import time
+obj = time.gmtime(0)
+epoch = time.asctime(obj)
+print("The epoch is:",epoch)
+curr_time = round(time.time()*1000)
+print("Milliseconds since epoch:",curr_time)
+
+class MethodTimer:
+
+    def __init__(self):
+        print("Initialize MethodTimer.")
+        self.start_time = time.time()
+        print( "> starting timer ", self.start_time )
+    
+    def print_time(self, text):
+        elapsed_time = time.time() - self.start_time
+        print(text, ": elapsed: ", round(elapsed_time * 1000 * 1000), "s" )
 
 
-# Load environment variables
-persist_directory = os.environ.get('PERSIST_DIRECTORY', 'db')
-source_directory = os.environ.get('SOURCE_DIRECTORY', 'text_corpus')
+timer = MethodTimer()
+timer.print_time("testing")
 
-# all-MiniLM-L6-v2:
-# It maps sentences & paragraphs to a 384 dimensional dense vector space 
-# and can be used for tasks like clustering or semantic search.
-embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME', 'all-MiniLM-L6-v2')
-chunk_size = 500
-chunk_overlap = 50
-
-
-# Custom document loaders
 class MyElmLoader(UnstructuredEmailLoader):
     """Wrapper to fallback to text/plain when default does not work"""
 
@@ -64,6 +80,10 @@ class MyElmLoader(UnstructuredEmailLoader):
             raise type(e)(f"{self.file_path}: {e}") from e
 
         return doc
+    
+
+
+
 
 
 # Map file extensions to document loaders and their arguments
@@ -84,6 +104,21 @@ LOADER_MAPPING = {
     ".txt": (TextLoader, {"encoding": "utf8"}),
     # Add more mappings for other file extensions and loaders as needed
 }
+
+
+
+# Load environment variables
+persist_directory = os.environ.get('PERSIST_DIRECTORY', 'db')
+source_directory  = os.environ.get('SOURCE_DIRECTORY', 'text_corpus')
+
+# all-MiniLM-L6-v2:
+# It maps sentences & paragraphs to a 384 dimensional dense vector space 
+# and can be used for tasks like clustering or semantic search.
+embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME', 'all-MiniLM-L6-v2')
+chunk_size = 500
+chunk_overlap = 50
+
+
 
 
 def load_single_document(file_path: str) -> Document:
@@ -117,7 +152,7 @@ def load_documents(source_dir: str, ignored_files: List[str] = []) -> List[Docum
 
     return results
 
-def process_documents(ignored_files: List[str] = []) -> List[Document]:
+def split_docs(ignored_files: List[str] = []) -> List[Document]:
     """
     Load documents and split in chunks
     """
@@ -168,7 +203,7 @@ def main():
         print(f"Appending to existing vectorstore at {persist_directory}")
         db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
         collection = db.get()
-        texts = process_documents([metadata['source'] for metadata in collection['metadatas']])
+        texts = split_docs([metadata['source'] for metadata in collection['metadatas']])
         print("Text corpus read in: ", timeit.timeit() - start)
         print(f"Creating embeddings. May take some minutes...")
         try:
@@ -179,7 +214,7 @@ def main():
     else:
         # Create and store locally vectorstore
         print("Creating new vector store: ", persist_directory)
-        texts = process_documents()
+        texts = split_docs()
         print("Text corpus read in: ", timeit.timeit() - start)
         print(f"Creating embeddings db. May take some minutes...")
         db = Chroma.from_documents(texts, embeddings, persist_directory=persist_directory, client_settings=CHROMA_SETTINGS)
