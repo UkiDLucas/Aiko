@@ -35,6 +35,8 @@ a = rand(Float64, 10^3)
 b = rand(Float64, 10^3)
 exec_counter = 0
 @btime simple_add_vectors!(a, b, exec_counter)
+#  277.733 ns (1 allocation: 7.94 KiB) - MacBook Pro M2 Max 14 inch
+
 
 
 
