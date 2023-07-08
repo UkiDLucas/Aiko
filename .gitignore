@@ -17,3 +17,5 @@ vocabulary/*
 .vscode/settings.json
 settings.json
 **/.env
+*.py
+src/python/.ipynb_checkpoints/*
