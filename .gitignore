@@ -18,3 +18,5 @@ vocabulary/*
 settings.json
 **/.env
 src/python/.ipynb_checkpoints/*
+src/python/privateGPT/source_documents/*
+
