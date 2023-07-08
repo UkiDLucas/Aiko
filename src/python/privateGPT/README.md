@@ -9,7 +9,12 @@ Built with [LangChain](https://github.com/hwchase17/langchain), [GPT4All](https:
 In order to set your environment up to run the code here, first install all requirements:
 
 ```shell
-pip3 install -r requirements.txt
+conda env list
+conda activate env_privateGPT
+pip install -r requirements.txt
+conda update --all
+conda update -n base -c defaults conda
+conda env export > environment.yml
 ```
 
 Then, download the LLM model and place it in a directory of your choice:
