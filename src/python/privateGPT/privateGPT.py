@@ -12,13 +12,25 @@ import time
 load_dotenv()
 
 embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
+print("embeddings_model_name=", embeddings_model_name)
+
 persist_directory = os.environ.get('PERSIST_DIRECTORY')
+print("persist_directory=", persist_directory)
 
 model_type = os.environ.get('MODEL_TYPE')
+print("model_type=", model_type)
+
 model_path = os.environ.get('MODEL_PATH')
+print("model_path=", model_path)
+
 model_n_ctx = os.environ.get('MODEL_N_CTX')
+print("model_n_ctx=", model_n_ctx)
+
 model_n_batch = int(os.environ.get('MODEL_N_BATCH',8))
+print("model_n_batch=", model_n_batch)
+
 target_source_chunks = int(os.environ.get('TARGET_SOURCE_CHUNKS',4))
+print("target_source_chunks=", target_source_chunks)
 
 from constants import CHROMA_SETTINGS
 
@@ -35,7 +47,10 @@ def main():
         case "LlamaCpp":
             llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, n_batch=model_n_batch, callbacks=callbacks, verbose=False)
         case "GPT4All":
-            llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', n_batch=model_n_batch, callbacks=callbacks, verbose=False)
+            #llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', n_batch=model_n_batch, callbacks=callbacks, verbose=False)
+ 
+            llm = GPT4All(model=model_path,  verbose=True)
+
         case _default:
             # raise exception if model_type is not supported
             raise Exception(f"Model type {model_type} is not supported. Please choose one of the following: LlamaCpp, GPT4All")
@@ -56,15 +71,16 @@ def main():
         end = time.time()
 
         # Print the result
-        print("\n\n> Question:")
-        print(query)
-        print(f"\n> Answer (took {round(end - start, 2)} s.):")
-        print(answer)
+        print("\n\n  Question:\n", query)
+        print(f"\n\n  ANSWER took {round(end - start, 2)} seconds:\n", answer)
 
         # Print the relevant sources used for the answer
+        print("\n\n  DOCUMENT SOURCES: \n" )
+        count = 1
         for document in docs:
-            print("\n> " + document.metadata["source"] + ":")
-            print(document.page_content)
+            print(count, "). \"" + document.metadata["source"] + "\":")
+            print("\n    EXCERPT: \n" + document.page_content)
+            count = count + 1
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='privateGPT: Ask questions to your documents without an internet connection, '

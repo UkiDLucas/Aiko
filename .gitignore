@@ -28,3 +28,4 @@ AIKO.env
 src/python/privateGPT/__pycache__/*.*
 
 src/python/privateGPT/db/*
+src/python/privateGPT/models/*.*
