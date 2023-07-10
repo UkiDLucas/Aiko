@@ -21,3 +21,5 @@ src/python/.ipynb_checkpoints/*
 src/python/privateGPT/source_documents/*
 
 .env
+.env
+Uki.env
