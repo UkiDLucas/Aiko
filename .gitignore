@@ -24,3 +24,4 @@ src/python/privateGPT/source_documents/*
 .env
 Uki.env
 **/.ipynb_checkpoints/*.*
+AIKO.env
