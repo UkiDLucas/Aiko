@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import os
 import glob
+# pip install langchain
+#import langchain
+from langchain.document_loaders import DirectoryLoader
 from typing import List
 from dotenv import load_dotenv
 from multiprocessing import Pool
@@ -31,6 +34,10 @@ load_dotenv()
 
 
 # Load environment variables
+
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+print("OPENAI_API_KEY=", OPENAI_API_KEY)
+
 persist_directory = os.environ.get('PERSIST_DIRECTORY')
 source_directory = os.environ.get('SOURCE_DIRECTORY', 'source_documents')
 embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME')
