@@ -27,3 +27,4 @@ Uki.env
 AIKO.env
 src/python/privateGPT/__pycache__/*.*
 
+src/python/privateGPT/db/*.*
