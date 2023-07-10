@@ -2,6 +2,7 @@
 import os
 import glob
 # pip install langchain
+# pip install pymupdf
 #import langchain
 from langchain.document_loaders import DirectoryLoader
 from typing import List
