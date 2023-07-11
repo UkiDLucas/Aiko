@@ -11,6 +11,17 @@ import time
 
 load_dotenv()
 
+# MODEL_TYPE: 
+# either "LlamaCpp" or "GPT4All"
+# PERSIST_DIRECTORY: 
+# Provide the absolute path to the desired directory.
+# LLAMA_EMBEDDINGS_MODEL: 
+# absolute path of your LlamaCpp-supported embeddings model binary. 
+# MODEL_PATH: 
+# path of your GPT4All or LlamaCpp-supported LLM model
+# MODEL_N_CTX: 
+# Specify the maximum token limit for both the embeddings and LLM models.
+
 embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
 print("embeddings_model_name=", embeddings_model_name)
 
@@ -60,13 +71,16 @@ def main():
     while True:
         query = input("\nEnter a query: ")
         if query == "exit":
+            break        
+        if query == "quit":
             break
         if query.strip() == "":
             continue
 
         # Get the answer from the chain
         start = time.time()
-        res = qa(query)
+        prompt = "Assume you are a professor of science and you are explaining concept to a computer science student. " + query
+        res = qa(prompt)
         answer, docs = res['result'], [] if args.hide_source else res['source_documents']
         end = time.time()
 
@@ -78,8 +92,8 @@ def main():
         print("\n\n  DOCUMENT SOURCES: \n" )
         count = 1
         for document in docs:
-            print(count, "). \"" + document.metadata["source"] + "\":")
-            print("\n    EXCERPT: \n" + document.page_content)
+            print("\n\n    ", count, "). \"" + document.metadata["source"] + "\":")
+            print("\n    EXCERPT: \n    " + document.page_content)
             count = count + 1
 
 def parse_arguments():

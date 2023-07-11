@@ -37,12 +37,12 @@ load_dotenv()
 # Load environment variables
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-print("OPENAI_API_KEY=", OPENAI_API_KEY)
+# print("OPENAI_API_KEY=", OPENAI_API_KEY)
 
 persist_directory = os.environ.get('PERSIST_DIRECTORY')
 source_directory = os.environ.get('SOURCE_DIRECTORY', 'source_documents')
 embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME')
-chunk_size = 500
+chunk_size = 600
 chunk_overlap = 50
 
 
@@ -130,7 +130,10 @@ def process_documents(ignored_files: List[str] = []) -> List[Document]:
     print(f"Loaded {len(documents)} new documents from {source_directory}")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     texts = text_splitter.split_documents(documents)
-    print(f"Split into {len(texts)} chunks of text (max. {chunk_size} tokens each)")
+    number_of_texts = len(texts)
+    print(f"Split documents into {number_of_texts} chunks of text (max. {chunk_size} tokens each)")
+    print(f"Chunk overlap is {chunk_overlap}.", )
+    print(f"Total text is {number_of_texts * chunk_size} tokens.", )
     return texts
 
 def does_vectorstore_exist(persist_directory: str) -> bool:
