@@ -1,3 +1,7 @@
 {
-    "julia.environmentPath": "/Users/uki_lucas/Library/CloudStorage/GoogleDrive-ukidlucas@gmail.com/My Drive/_REPOS/Aiko/src/julia/parallel_computing"
+    "julia.environmentPath": "/usr/local/bin/julia",
+    "workbench.preferredHighContrastColorTheme": "Visual Studio Light",
+    "workbench.preferredDarkColorTheme": "Visual Studio Light",
+    "python.analysis.typeCheckingMode": "basic",
+    "workbench.preferredHighContrastLightColorTheme": "Visual Studio Light"
 }
