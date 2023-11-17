@@ -108,7 +108,7 @@ def generate_key(master, salt):
     key = base64.urlsafe_b64encode(kdf.derive(master.encode()))
     return key
 
-
+# %%
 def encrypt_text(text, salt):
     key = generate_key(text, salt)
     print("key: ", key)
@@ -118,7 +118,8 @@ def encrypt_text(text, salt):
     return hash.decode(),  key.decode('utf-8')
 
 
-def decrypt_text(hash, key):
+def decrypt_text(hash, key_text):
+    key = bytes(saved_text, 'utf-8')
     decryptor = Fernet(key)
     text = decryptor.decrypt(hash.encode())
     return text.decode()
@@ -129,12 +130,7 @@ saved_key = result[1]
 print("encrypted: ", encrypted)
 print("saved_key: ", saved_key)
 # %%
-code_bytes = b'I41_sE8EtPvzb8-XooyiuG4KF_-AuGBDYQNvryTP0BY='
-#code_bytes = bytes(saved, 'utf-8')
-#code_bytes = saved.encode("utf-8")
-key = base64.urlsafe_b64encode(code_bytes.ljust(32)[:32])
-#fernet = Fernet(key)
- 
-decrypted = decrypt_text(encrypted, key)
+saved_text = "I41_sE8EtPvzb8-XooyiuG4KF_-AuGBDYQNvryTP0BY="
+decrypted = decrypt_text(encrypted, saved_text)
 print("decrypted: ", decrypted)
 # %%
